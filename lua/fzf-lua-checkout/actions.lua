@@ -28,7 +28,6 @@ function M.custom(cmd_placeholder, action_opts)
       branch = vim.split(selected[1], " ")[1]
     else
       for _, v in ipairs(selected) do
-        -- branch = branch .. " " .. vim.split(v, " ")[1]
         table.insert(branches, vim.split(v, " ")[1])
       end
     end
@@ -65,7 +64,7 @@ function M.custom(cmd_placeholder, action_opts)
     local expand_branches_at = 0
     -- Replace placeholders with values.
     for i = 1, #cmd do
-      if cmd[i] == "{branch}" and #branches > 0 then
+      if (cmd[i] == "{branch}" or cmd[i] == "{tag}") and #branches > 0 then
         expand_branches_at = i
       else
         cmd[i] = utils.format(cmd[i], subs)

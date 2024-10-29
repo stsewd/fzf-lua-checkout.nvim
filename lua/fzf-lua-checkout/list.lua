@@ -28,17 +28,115 @@ local function get_list_cmd(subcommand, opts, format_opts)
     local filter = local_opts.filter
     if filter == "all" then
       filter = "--all"
+    elseif filter == "remotes" then
+      filter = "--remotes"
+    elseif filter == "locals" then
+      filter = nil
     end
-    table.insert(cmd, filter)
+    if filter then
+      table.insert(cmd, filter)
+    end
   end
   return cmd
 end
 
-local function list(subcommand, opts)
+---Remove a reference from a list of branch entries.
+---@param ref string The reference to remove.
+---@param list table The list of branch entries.
+local function remove_ref_from_list(ref, list)
+  -- Matches ANSI escape codes like:
+  -- \27[1;33mmain
+  -- \27[m\27[32mmain
+  local pattern = "\27%[[0-9;]*m%s*([^%s]+)"
+  for i, v in ipairs(list) do
+    local _, _, match = v:find(pattern)
+    if match == ref then
+      return table.remove(list, i)
+    end
+  end
+  return nil
+end
+
+local function get_current_ref(cwd)
+  local cmd = {
+    "git",
+    "-C",
+    cwd,
+    "symbolic-ref",
+    "--short",
+    "-q",
+    "HEAD",
+  }
+  local result = vim.system(cmd, { text = true }):wait()
+  local ref = vim.trim(result.stdout)
+  if ref ~= "" then
+    return ref
+  end
+
+  cmd = {
+    "git",
+    "-C",
+    cwd,
+    "rev-parse",
+    "--short",
+    "HEAD",
+  }
+  result = vim.system(cmd, { text = true }):wait()
+  return vim.trim(result.stdout)
+end
+
+local function get_previous_ref(cwd)
+  local cmd = {
+    "git",
+    "-C",
+    cwd,
+    "rev-parse",
+    "-q",
+    "--abbrev-ref",
+    "--symbolic-full-name",
+    "@{-1}",
+  }
+  local result = vim.system(cmd, { text = true }):wait()
+  local ref = vim.trim(result.stdout)
+  if result.code == 0 and ref ~= "" then
+    return ref
+  end
+
+  cmd = {
+    "git",
+    "-C",
+    cwd,
+    "rev-parse",
+    "--short",
+    "-q",
+    "@{-1}",
+  }
+  result = vim.system(cmd, { text = true }):wait()
+  return vim.trim(result.stdout)
+end
+
+---@param subcommand string "branch" or "tag"
+---@param opts table? Options that will be merged with the current config.
+---@param action string? If given, only this action will be shown.
+local function list(subcommand, opts, action)
   opts = vim.tbl_deep_extend("force", vim.deepcopy(config), opts or {})
+  local local_opts = opts[subcommand] or {}
+  local prompt = local_opts.prompt
+
+  -- If action is given, we only show that action.
+  if action then
+    for k, v in pairs(local_opts.actions) do
+      if k == action then
+        prompt = v.prompt or prompt
+        local_opts.actions[k].keymap = "enter"
+      else
+        local_opts.actions[k] = nil
+      end
+    end
+  end
+
   local git = opts.git_bin
   local cwd = vim.fn.getcwd()
-  local local_opts = opts[subcommand]
   -- if opts.use_current_buf_cwd then
   --   cwd = vim.fn.expand("%:p:h")
   -- end
@@ -59,9 +157,28 @@ local function list(subcommand, opts)
   local result = vim.system(cmd, { text = true }):wait()
   local results = vim.split(vim.trim(result.stdout), "\n")
 
+  local header = nil
+  if opts.show_current_ref_in_header then
+    local current_ref = get_current_ref(cwd)
+    remove_ref_from_list(current_ref, results)
+    header = current_ref
+  end
+
+  if opts.list_previous_ref_first then
+    local previous_ref = get_previous_ref(cwd)
+    if previous_ref ~= "" then
+      local previous_ref_entry = remove_ref_from_list(previous_ref, results)
+      -- We should always have a previous ref, but just in case.
+      if previous_ref_entry then
+        table.insert(results, 1, previous_ref_entry)
+      end
+    end
+  end
+
   local fzf_exec_opts = {
-    prompt = local_opts.prompt,
+    prompt = prompt,
     preview = preview,
+    header = header,
     fzf_opts = {
       ["--multi"] = true,
       ["--nth"] = 1,
@@ -72,12 +189,18 @@ local function list(subcommand, opts)
   fzf.fzf_exec(results, fzf_exec_opts)
 end
 
-function M.branches(opts)
-  list("branch", opts)
+---List git branches.
+---@param opts table? Options that will be merged with the current config.
+---@param action string? If given, only this action will be shown.
+function M.branches(opts, action)
+  list("branch", opts, action)
 end
 
-function M.tags(opts)
-  list("tag", opts)
+---List git tags.
+---@param opts table? Options that will be merged with the current config.
+---@param action string? If given, only this action will be shown.
+function M.tags(opts, action)
+  list("tag", opts, action)
 end
 
 return M
