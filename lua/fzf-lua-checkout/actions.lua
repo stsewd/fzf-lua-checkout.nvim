@@ -4,24 +4,17 @@ local utils = require("fzf-lua-checkout.utils")
 
 local M = {}
 
-local function get_cwd_from_current_buffer()
-  local cwd = vim.fn.expand("%:p:h")
-  return cwd
-end
-
---- @param cmd_placeholder string[]
---- @param action_opts {name: string, desc: string, required: string[]}
-function M.custom(cmd_placeholder, action_opts)
-  local desc = action_opts.desc or action_opts.name or "custom action"
+--- @param subcommand string branch or tag
+--- @param cwd string
+--- @param action string
+--- @param config table
+function M.make_action(subcommand, cwd, action, config)
+  local action_opts = config[subcommand].actions[action]
+  local desc = action_opts.desc or action
   local fn = function(selected, opts)
-    -- We are modifying the cmd_placeholder in place,
+    -- We are modifying the command in place,
     -- so we need to make a copy
-    local cmd = vim.deepcopy(cmd_placeholder)
-    local cwd = vim.fn.getcwd()
-    -- TODO: use the same cwd as the one used in the listing.
-    -- if action_opts.use_current_buf_cwd then
-    --   cwd = get_cwd_from_current_buffer()
-    -- end
+    local cmd = vim.deepcopy(action_opts.cmd)
     local branch = ""
     local branches = {}
     if not action_opts.multiple and #selected > 0 then
@@ -36,7 +29,7 @@ function M.custom(cmd_placeholder, action_opts)
     end
 
     local subs = {
-      git = action_opts.git_bin or "git",
+      git = config.git_bin or "git",
       cwd = cwd,
       branch = branch,
       tag = branch,
@@ -72,11 +65,8 @@ function M.custom(cmd_placeholder, action_opts)
     end
 
     if expand_branches_at > 0 then
-      local a = vim.list_slice(cmd, 1, expand_branches_at - 1)
-      local b = vim.list_slice(cmd, expand_branches_at + 1)
-      vim.list_extend(a, branches)
-      vim.list_extend(a, b)
-      cmd = a
+      table.remove(cmd, expand_branches_at)
+      utils.extend_list_at(cmd, branches, expand_branches_at)
     end
 
     -- Execute the command asynchronously.

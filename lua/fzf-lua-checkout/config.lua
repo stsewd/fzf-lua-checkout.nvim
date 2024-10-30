@@ -27,7 +27,7 @@ local config = {
     actions = {
       checkout = {
         prompt = "Checkout> ",
-        execute = { "{git}", "-C", "{cwd}", "checkout", "{branch}" },
+        cmd = { "{git}", "-C", "{cwd}", "checkout", "{branch}" },
         -- If empty, the name would be used.
         desc = nil,
         required = { "branch" },
@@ -39,7 +39,7 @@ local config = {
       },
       track = {
         prompt = "Track> ",
-        execute = { "{git}", "-C", "{cwd}", "checkout", "--track", "{branch}" },
+        cmd = { "{git}", "-C", "{cwd}", "checkout", "--track", "{branch}" },
         required = { "branch" },
         keymap = "alt-enter",
         multiple = false,
@@ -47,7 +47,7 @@ local config = {
       },
       create = {
         prompt = "Create> ",
-        execute = { "{git}", "-C", "{cwd}", "checkout", "-b", "{input}" },
+        cmd = { "{git}", "-C", "{cwd}", "checkout", "-b", "{input}" },
         required = { "input" },
         keymap = "ctrl-g",
         multiple = false,
@@ -55,7 +55,7 @@ local config = {
       },
       delete = {
         prompt = "Delete> ",
-        execute = { "{git}", "-C", "{cwd}", "branch", "--delete", "--force", "{branch}" },
+        cmd = { "{git}", "-C", "{cwd}", "branch", "--delete", "--force", "{branch}" },
         required = { "branch" },
         keymap = "ctrl-d",
         multiple = true,
@@ -63,7 +63,7 @@ local config = {
       },
       merge = {
         prompt = "Merge> ",
-        execute = { "{git}", "-C", "{cwd}", "merge", "{branch}" },
+        cmd = { "{git}", "-C", "{cwd}", "merge", "{branch}" },
         required = { "branch" },
         keymap = "ctrl-e",
         multiple = false,
@@ -71,7 +71,7 @@ local config = {
       },
       rebase = {
         prompt = "Rebase> ",
-        execute = { "{git}", "-C", "{cwd}", "rebase", "{branch}" },
+        cmd = { "{git}", "-C", "{cwd}", "rebase", "{branch}" },
         required = { "branch" },
         keymap = "ctrl-r",
         multiple = false,
@@ -84,7 +84,7 @@ local config = {
     actions = {
       checkout = {
         prompt = "Checkout> ",
-        execute = { "{git}", "-C", "{cwd}", "checkout", "{tag}" },
+        cmd = { "{git}", "-C", "{cwd}", "checkout", "{tag}" },
         required = { "tag" },
         keymap = "enter",
         multiple = false,
@@ -92,7 +92,7 @@ local config = {
       },
       create = {
         prompt = "Create> ",
-        execute = { "{git}", "-C", "{cwd}", "tag", "{input}" },
+        cmd = { "{git}", "-C", "{cwd}", "tag", "{input}" },
         required = { "input" },
         keymap = "ctrl-g",
         multiple = false,
@@ -100,7 +100,7 @@ local config = {
       },
       delete = {
         prompt = "Delete> ",
-        execute = { "{git}", "-C", "{cwd}", "tag", "--delete", "{tag}" },
+        cmd = { "{git}", "-C", "{cwd}", "tag", "--delete", "{tag}" },
         required = { "tag" },
         keymap = "ctrl-d",
         multiple = true,
