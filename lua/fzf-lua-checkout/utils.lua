@@ -28,12 +28,4 @@ function M.format_list(list, opts)
   return result
 end
 
-function M.extend_list_at(list_a, list_b, at)
-  for _, v in ipairs(list_b) do
-    table.insert(list_a, at, v)
-    at = at + 1
-  end
-  return list_a
-end
-
 return M

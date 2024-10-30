@@ -2,7 +2,7 @@
 
 Manage branches and tags with [fzf-lua](https://github.com/ibhagwan/fzf-lua/)
 
-> This is a port of [fzf-checkout.vim](https://github.com/stsewd/fzf-checkout.vim) to fzf-lua.
+> This is a port of [fzf-checkout.vim](https://github.com/stsewd/fzf-checkout.vim) for fzf-lua.
 
 ## Installation
 
@@ -27,4 +27,5 @@ Install using your favorite package manager, for example with [lazy.nvim](https:
          { desc = "List git tags" },
       },
     }
+}
 ```
