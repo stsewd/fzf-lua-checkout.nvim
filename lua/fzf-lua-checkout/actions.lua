@@ -55,7 +55,7 @@ function M.make_action(subcommand, cwd, action, config)
     for _, field in ipairs(action_opts.required or {}) do
       if not format_opts[field] or format_opts[field] == "" then
         local msg = string.format("A %s is required", field)
-        vim.notify(msg, vim.log.levels.ERROR)
+        vim.notify(msg, vim.log.levels.ERROR, { title = "fzf-lua-checkout" })
         return
       end
     end
@@ -73,7 +73,7 @@ function M.make_action(subcommand, cwd, action, config)
     local cmd = get_action_cmd(action_opts.cmd, branches, format_opts)
     local onexit = function(result)
       local loglevel = result.code == 0 and vim.log.levels.INFO or vim.log.levels.ERROR
-      vim.notify(result.stdout .. "\n" .. result.stderr, loglevel)
+      vim.notify(result.stdout .. "\n" .. result.stderr, loglevel, { title = "fzf-lua-checkout" })
     end
     vim.system(cmd, { text = true }, onexit)
   end

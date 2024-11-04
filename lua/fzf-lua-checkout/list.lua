@@ -161,6 +161,11 @@ local function list(subcommand, opts, action)
 
   local cmd = get_list_cmd(subcommand, opts, format_opts)
   local result = vim.system(cmd, { text = true }):wait()
+  if result.code ~= 0 then
+    local msg = string.format("Error running list command.\n%s\n%s", result.stdout, result.stderr)
+    vim.notify(msg, vim.log.levels.ERROR, { title = "fzf-lua-checkout" })
+    return
+  end
   local results = vim.split(vim.trim(result.stdout), "\n")
 
   -- Remove thing that aren't valid branches or tags.
