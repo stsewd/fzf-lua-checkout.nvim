@@ -8,7 +8,7 @@ local function get_actions(subcommand, cwd, opts)
   local local_opts = opts[subcommand]
   local result = {}
   for action_name, action_opts in pairs(local_opts.actions) do
-    -- TODO: support action as a function.
+    -- TODO: support action as a function?
     local fn = actions.make_action(subcommand, cwd, action_name, opts)
     result[action_opts.keymap] = fn
   end
@@ -166,7 +166,7 @@ local function list(subcommand, opts, action)
     vim.notify(msg, vim.log.levels.ERROR, { title = "fzf-lua-checkout" })
     return
   end
-  local results = vim.split(vim.trim(result.stdout), "\n")
+  local results = vim.split(vim.trim(result.stdout), "\n", { trimempty = true })
 
   -- Remove thing that aren't valid branches or tags.
   -- (HEAD detached at origin/main)
