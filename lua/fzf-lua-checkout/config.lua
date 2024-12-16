@@ -23,6 +23,9 @@ local config = {
   fzf_exec_opts = {},
   branch = {
     prompt = "Branches> ",
+    -- TODO: implement a "smart" filter that filters remote branches that are not already tracked locally?
+    -- Or one that shows only the name of the branch, without the remote,
+    -- and then it automatically tracks the remote branch on checkout?
     filter = "all", -- all, locals, remotes, smart?
     actions = {
       checkout = {
@@ -61,22 +64,23 @@ local config = {
         multiple = true,
         confirm = true,
       },
-      merge = {
-        prompt = "Merge> ",
-        cmd = { "{git}", "-C", "{cwd}", "merge", "{branch}" },
-        required = { "branch" },
-        keymap = "ctrl-e",
-        multiple = false,
-        confirm = true,
-      },
-      rebase = {
-        prompt = "Rebase> ",
-        cmd = { "{git}", "-C", "{cwd}", "rebase", "{branch}" },
-        required = { "branch" },
-        keymap = "ctrl-r",
-        multiple = false,
-        confirm = true,
-      },
+      -- TODO: maybe just don't include these by default?
+      -- merge = {
+      --   prompt = "Merge> ",
+      --   cmd = { "{git}", "-C", "{cwd}", "merge", "{branch}" },
+      --   required = { "branch" },
+      --   -- keymap = "ctrl-e",
+      --   multiple = false,
+      --   confirm = true,
+      -- },
+      -- rebase = {
+      --   prompt = "Rebase> ",
+      --   cmd = { "{git}", "-C", "{cwd}", "rebase", "{branch}" },
+      --   required = { "branch" },
+      --   -- keymap = "ctrl-r",
+      --   multiple = false,
+      --   confirm = true,
+      -- },
     },
   },
   tag = {

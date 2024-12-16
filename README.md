@@ -20,14 +20,14 @@ Install using your favorite package manager, for example with [lazy.nvim](https:
         function()
           require("fzf-lua-checkout").branches()
         end,
-        { desc = "List git branches" },
+        desc = "List git branches",
       },
       {
         "<leader>ft",
         function()
           require("fzf-lua-checkout").tags()
         end,
-        { desc = "List git tags" },
+        desc = "List git tags",
       },
     },
   },

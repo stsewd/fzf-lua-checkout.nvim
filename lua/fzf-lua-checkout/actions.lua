@@ -75,7 +75,7 @@ function M.make_action(subcommand, cwd, action, config)
       local loglevel = result.code == 0 and vim.log.levels.INFO or vim.log.levels.ERROR
       vim.notify(result.stdout .. "\n" .. result.stderr, loglevel, { title = "fzf-lua-checkout" })
     end
-    vim.system(cmd, { text = true }, onexit)
+    vim.system(cmd, { text = true }, vim.schedule_wrap(onexit))
   end
   fzf.config.set_action_helpstr(fn, desc)
   return fn
