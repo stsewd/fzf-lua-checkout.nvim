@@ -73,7 +73,11 @@ function M.make_action(subcommand, cwd, action, config)
     local cmd = get_action_cmd(action_opts.cmd, branches, format_opts)
     local onexit = function(result)
       local loglevel = result.code == 0 and vim.log.levels.INFO or vim.log.levels.ERROR
-      vim.notify(result.stdout .. "\n" .. result.stderr, loglevel, { title = "fzf-lua-checkout" })
+      local msg = result.stdout
+      if result.stderr ~= "" then
+        msg = msg .. "\n" .. result.stderr
+      end
+      vim.notify(msg, loglevel, { title = "fzf-lua-checkout" })
     end
     vim.system(cmd, { text = true }, vim.schedule_wrap(onexit))
   end
