@@ -36,7 +36,7 @@ function M.make_action(subcommand, cwd, action, config)
       table.insert(branches, vim.split(v, " ")[1])
     end
 
-    local branch = ""
+    local branch
     if action_opts.multiple then
       branch = table.concat(branches, " ")
     else
